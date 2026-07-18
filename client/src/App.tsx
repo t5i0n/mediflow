@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Navbar from "./components/Navbar";
 import DoctorCard from "./components/DoctorCard";
 
@@ -8,12 +9,19 @@ const doctors = [
 ];
 
 function App() {
+  const [bookedDoctor, setBookedDoctor] = useState<string | null>(null);
   return (
     <div className="min-h-screen bg-slate-50">
       <Navbar />
 
       <main className="p-6 flex flex-col items-center gap-8">
         <h1 className="text-3xl font-bold text-slate-900 mt-4">Our Doctors</h1>
+
+        {bookedDoctor && (
+          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg font-medium">
+            ✅ Appointment booked with {bookedDoctor}!
+          </div>
+        )}
 
         <div className="flex flex-col md:flex-row gap-6">
           {doctors.map((doctor) => (
@@ -22,7 +30,7 @@ function App() {
               name={doctor.name}
               specialty={doctor.specialty}
               yearsExperience={doctor.yearsExperience}
-              onBook={() => alert(`Booking with ${doctor.name}!`)}
+              onBook={() => setBookedDoctor(doctor.name)}
             />
           ))}
         </div>
