@@ -1,0 +1,38 @@
+import { useState } from "react";
+import DoctorCard from "../components/DoctorCard";
+
+const doctors = [
+  { name: "Dr. Helen Tesfaye", specialty: "Cardiology", yearsExperience: 8 },
+  { name: "Dr. Liya Alemayehu", specialty: "Dermatology", yearsExperience: 5 },
+  { name: "Dr. Samson Bekele", specialty: "Neurology", yearsExperience: 12 },
+];
+
+function DoctorsPage() {
+  const [bookedDoctor, setBookedDoctor] = useState<string | null>(null);
+
+  return (
+    <div className="p-6 flex flex-col items-center gap-8">
+      <h1 className="text-3xl font-bold text-slate-900 mt-4">Our Doctors</h1>
+
+      {bookedDoctor && (
+        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg font-medium">
+          ✅ Appointment booked with {bookedDoctor}!
+        </div>
+      )}
+
+      <div className="flex flex-col md:flex-row gap-6">
+        {doctors.map((doctor) => (
+          <DoctorCard
+            key={doctor.name}
+            name={doctor.name}
+            specialty={doctor.specialty}
+            yearsExperience={doctor.yearsExperience}
+            onBook={() => setBookedDoctor(doctor.name)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default DoctorsPage;
