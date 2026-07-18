@@ -1,3 +1,4 @@
+import Navbar from "./components/Navbar";
 import DoctorCard from "./components/DoctorCard";
 
 const doctors = [
@@ -8,20 +9,24 @@ const doctors = [
 
 function App() {
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center gap-8 p-6">
-      <h1 className="text-4xl font-bold text-blue-600">MediFlow</h1>
+    <div className="min-h-screen bg-slate-50">
+      <Navbar />
 
-      <div className="flex flex-col md:flex-row gap-6">
-        {doctors.map((doctor) => (
-          <DoctorCard
-            key={doctor.name}
-            name={doctor.name}
-            specialty={doctor.specialty}
-            yearsExperience={doctor.yearsExperience}
-            onBook={() => alert(`Booking with ${doctor.name}!`)}
-          />
-        ))}
-      </div>
+      <main className="p-6 flex flex-col items-center gap-8">
+        <h1 className="text-3xl font-bold text-slate-900 mt-4">Our Doctors</h1>
+
+        <div className="flex flex-col md:flex-row gap-6">
+          {doctors.map((doctor) => (
+            <DoctorCard
+              key={doctor.name}
+              name={doctor.name}
+              specialty={doctor.specialty}
+              yearsExperience={doctor.yearsExperience}
+              onBook={() => alert(`Booking with ${doctor.name}!`)}
+            />
+          ))}
+        </div>
+      </main>
     </div>
   );
 }
