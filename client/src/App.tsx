@@ -14,6 +14,15 @@ function App() {
           Book Appointment
         </Button>
       </Card>
+      <Card>
+        <h2 className="text-xl font-semibold text-slate-900 mb-2">
+          Dr. Liya Alemayehu
+        </h2>
+        <p className="text-slate-500 mb-4">Neurology · 5 years experience</p>
+        <Button onClick={() => alert("Hello from MediFlow!")}>
+          Book Appointment
+        </Button>
+      </Card>
     </div>
   );
 }
