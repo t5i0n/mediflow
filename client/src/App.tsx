@@ -7,6 +7,9 @@ function App() {
       <Button onClick={() => alert("Hello from MediFlow!")}>
         Book Appointment
       </Button>
+      <Button onClick={() => alert("Cancel Appointment!")}>
+        Cancel Appointment
+      </Button>
     </div>
   );
 }
