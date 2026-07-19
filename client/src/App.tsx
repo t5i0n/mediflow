@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar";
 import DoctorsPage from "./pages/DoctorsPage";
 import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
+import DepartmentsPage from "./pages/DepartmentsPage";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
           <Route path="/" element={<DashboardPage />} />
           <Route path="/doctors" element={<DoctorsPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/departments" element={<DepartmentsPage />} />
         </Routes>
       </div>
     </BrowserRouter>
