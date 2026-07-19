@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import "dotenv/config";
+import { prisma } from "./lib/prisma.js";
 
 const app = express();
 
@@ -9,6 +10,11 @@ app.use(express.json());
 
 app.get("/", (req, res) => {
   res.json({ message: "MediFlow API is running" });
+});
+
+app.get("/api/departments", async (req, res) => {
+  const departments = await prisma.department.findMany();
+  res.json(departments);
 });
 
 const PORT = process.env.PORT || 5000;
