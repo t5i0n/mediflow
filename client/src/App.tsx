@@ -5,6 +5,7 @@ import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
 import DepartmentsPage from "./pages/DepartmentsPage";
 import { AuthProvider } from "./contexts/AuthProvider";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -13,10 +14,31 @@ function App() {
         <div className="min-h-screen bg-slate-50">
           <Navbar />
           <Routes>
-            <Route path="/" element={<DashboardPage />} />
-            <Route path="/doctors" element={<DoctorsPage />} />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <DashboardPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/doctors"
+              element={
+                <ProtectedRoute>
+                  <DoctorsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/departments"
+              element={
+                <ProtectedRoute>
+                  <DepartmentsPage />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/departments" element={<DepartmentsPage />} />
           </Routes>
         </div>
       </BrowserRouter>
