@@ -42,7 +42,8 @@ model Department {
   description String?
   isActive    Boolean @default(true)
 
-  doctors Doctor[]
+  doctors      Doctor[]
+  appointments Appointment[]
 }
 
 model Doctor {
@@ -85,6 +86,9 @@ model Appointment {
   patient   Patient @relation(fields: [patientId], references: [id])
   doctorId  String
   doctor    Doctor  @relation(fields: [doctorId], references: [id])
+
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id])
 
   date     DateTime
   timeSlot String
