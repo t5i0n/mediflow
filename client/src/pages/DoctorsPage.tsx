@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import axios from "axios";
 import { api } from "../api/axios";
+import { createAppointment } from "../api/appointments";
 import DoctorCard from "../components/DoctorCard";
 
 type Doctor = {
@@ -14,12 +16,32 @@ type Doctor = {
 
 function DoctorsPage() {
   const [bookedDoctor, setBookedDoctor] = useState<string | null>(null);
+  const [bookingError, setBookingError] = useState<string | null>(null);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["doctors"],
     queryFn: async () => {
       const response = await api.get<Doctor[]>("/doctors");
       return response.data;
+    },
+  });
+
+  const bookingMutation = useMutation({
+    mutationFn: createAppointment,
+    onSuccess: (_, variables) => {
+      const doctor = data?.find((d) => d.id === variables.doctorId);
+      setBookedDoctor(
+        doctor ? `Dr. ${doctor.firstName} ${doctor.lastName}` : "the doctor",
+      );
+      setBookingError(null);
+    },
+    onError: (error) => {
+      if (axios.isAxiosError(error) && error.response?.data?.error) {
+        setBookingError(error.response.data.error);
+      } else {
+        setBookingError("Failed to book appointment");
+      }
+      setBookedDoctor(null);
     },
   });
 
@@ -37,6 +59,11 @@ function DoctorsPage() {
           ✅ Appointment booked with {bookedDoctor}!
         </div>
       )}
+      {bookingError && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg font-medium">
+          {bookingError}
+        </div>
+      )}
 
       <div className="flex flex-col md:flex-row flex-wrap justify-center gap-6">
         {data?.map((doctor) => (
@@ -46,7 +73,12 @@ function DoctorsPage() {
             specialty={doctor.specialization}
             yearsExperience={doctor.yearsExperience ?? 0}
             onBook={() =>
-              setBookedDoctor(`Dr. ${doctor.firstName} ${doctor.lastName}`)
+              bookingMutation.mutate({
+                doctorId: doctor.id,
+                date: "2026-08-01",
+                timeSlot: "10:00",
+                reason: "General consultation",
+              })
             }
           />
         ))}
