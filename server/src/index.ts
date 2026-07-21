@@ -4,11 +4,13 @@ import "dotenv/config";
 import { prisma } from "./lib/prisma.js";
 import authRoutes from "./routes/auth.routes.js";
 import { requireAuth } from "./middleware/auth.middleware.js";
+import appointmentRoutes from "./routes/appointments.routes.js";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use("/api/appointments", appointmentRoutes);
 app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => {
