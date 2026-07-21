@@ -1,14 +1,32 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "../api/axios";
 import DoctorCard from "../components/DoctorCard";
 
-const doctors = [
-  { name: "Dr. Helen Tesfaye", specialty: "Cardiology", yearsExperience: 8 },
-  { name: "Dr. Liya Alemayehu", specialty: "Dermatology", yearsExperience: 5 },
-  { name: "Dr. Samson Bekele", specialty: "Neurology", yearsExperience: 12 },
-];
+type Doctor = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  specialization: string;
+  yearsExperience: number | null;
+  department: { name: string };
+};
 
 function DoctorsPage() {
   const [bookedDoctor, setBookedDoctor] = useState<string | null>(null);
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["doctors"],
+    queryFn: async () => {
+      const response = await api.get<Doctor[]>("/doctors");
+      return response.data;
+    },
+  });
+
+  if (isLoading)
+    return <p className="p-6 text-slate-500">Loading doctors...</p>;
+  if (isError)
+    return <p className="p-6 text-red-600">Failed to load doctors.</p>;
 
   return (
     <div className="p-6 flex flex-col items-center gap-8">
@@ -20,14 +38,16 @@ function DoctorsPage() {
         </div>
       )}
 
-      <div className="flex flex-col md:flex-row gap-6">
-        {doctors.map((doctor) => (
+      <div className="flex flex-col md:flex-row flex-wrap justify-center gap-6">
+        {data?.map((doctor) => (
           <DoctorCard
-            key={doctor.name}
-            name={doctor.name}
-            specialty={doctor.specialty}
-            yearsExperience={doctor.yearsExperience}
-            onBook={() => setBookedDoctor(doctor.name)}
+            key={doctor.id}
+            name={`Dr. ${doctor.firstName} ${doctor.lastName}`}
+            specialty={doctor.specialization}
+            yearsExperience={doctor.yearsExperience ?? 0}
+            onBook={() =>
+              setBookedDoctor(`Dr. ${doctor.firstName} ${doctor.lastName}`)
+            }
           />
         ))}
       </div>
