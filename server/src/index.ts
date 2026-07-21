@@ -3,6 +3,7 @@ import cors from "cors";
 import "dotenv/config";
 import { prisma } from "./lib/prisma.js";
 import authRoutes from "./routes/auth.routes.js";
+import { requireAuth } from "./middleware/auth.middleware.js";
 
 const app = express();
 
@@ -14,7 +15,7 @@ app.get("/", (req, res) => {
   res.json({ message: "MediFlow API is running" });
 });
 
-app.get("/api/departments", async (req, res) => {
+app.get("/api/departments", requireAuth, async (req, res) => {
   const departments = await prisma.department.findMany();
   res.json(departments);
 });
