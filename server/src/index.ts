@@ -20,6 +20,13 @@ app.get("/api/departments", requireAuth, async (req, res) => {
   res.json(departments);
 });
 
+app.get("/api/doctors", requireAuth, async (req, res) => {
+  const doctors = await prisma.doctor.findMany({
+    include: { department: true },
+  });
+  res.json(doctors);
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
