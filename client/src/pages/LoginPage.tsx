@@ -1,17 +1,23 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useNavigate } from "react-router-dom";
+import { loginRequest } from "../api/auth";
+import { useAuth } from "../contexts/useAuth";
 
-// 1. Define the shape + rules of valid form data
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
-// 2. Derive a TypeScript type directly from the schema (no duplicating it)
 type LoginFormData = z.infer<typeof loginSchema>;
 
 function LoginPage() {
+  const [serverError, setServerError] = useState<string | null>(null);
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -21,10 +27,14 @@ function LoginPage() {
   });
 
   const onSubmit = async (data: LoginFormData) => {
-    // Later: this will call our real backend API
-    console.log("Form submitted with:", data);
-    await new Promise((resolve) => setTimeout(resolve, 1000)); // fake delay for now
-    alert(`Logged in as ${data.email}`);
+    setServerError(null);
+    try {
+      const result = await loginRequest(data.email, data.password);
+      login(result.user, result.token);
+      navigate("/");
+    } catch {
+      setServerError("Invalid email or password");
+    }
   };
 
   return (
@@ -32,6 +42,12 @@ function LoginPage() {
       <div className="bg-white rounded-2xl shadow-md border border-slate-100 p-8 w-full max-w-sm">
         <h1 className="text-2xl font-bold text-slate-900 mb-1">Welcome back</h1>
         <p className="text-slate-500 mb-6">Log in to your MediFlow account</p>
+
+        {serverError && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm mb-4">
+            {serverError}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <div>
