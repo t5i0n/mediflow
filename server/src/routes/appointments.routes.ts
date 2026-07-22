@@ -5,6 +5,7 @@ import {
   requireAuth,
   type AuthenticatedRequest,
 } from "../middleware/auth.middleware.js";
+import { requireRole } from "../middleware/role.middleware.js";
 
 const router = Router();
 
@@ -89,4 +90,64 @@ router.get("/", requireAuth, async (req: AuthenticatedRequest, res) => {
   res.json(appointments);
 });
 
+// Get appointments for the logged-in doctor
+router.get(
+  "/doctor/mine",
+  requireAuth,
+  requireRole("DOCTOR"),
+  async (req: AuthenticatedRequest, res) => {
+    const doctor = await prisma.doctor.findUnique({
+      where: { userId: req.user!.userId },
+    });
+    if (!doctor) {
+      return res.status(404).json({ error: "Doctor profile not found" });
+    }
+
+    const appointments = await prisma.appointment.findMany({
+      where: { doctorId: doctor.id },
+      include: { patient: true, department: true },
+      orderBy: { date: "asc" },
+    });
+    res.json(appointments);
+  },
+);
+
+// Update an appointment's status (approve/reject/complete)
+router.patch(
+  "/:id/status",
+  requireAuth,
+  requireRole("DOCTOR"),
+  async (req: AuthenticatedRequest, res) => {
+    const id = req.params.id as string;
+    const { status } = req.body;
+
+    const validStatuses = ["APPROVED", "REJECTED", "COMPLETED"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: "Invalid status" });
+    }
+
+    const doctor = await prisma.doctor.findUnique({
+      where: { userId: req.user!.userId },
+    });
+    if (!doctor) {
+      return res.status(404).json({ error: "Doctor profile not found" });
+    }
+
+    // Make sure this appointment actually belongs to THIS doctor
+    const appointment = await prisma.appointment.findUnique({ where: { id } });
+    if (!appointment || appointment.doctorId !== doctor.id) {
+      return res
+        .status(403)
+        .json({ error: "You can't modify this appointment" });
+    }
+
+    const updated = await prisma.appointment.update({
+      where: { id },
+      data: { status },
+      include: { patient: true, department: true },
+    });
+
+    res.json(updated);
+  },
+);
 export default router;
