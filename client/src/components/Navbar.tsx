@@ -29,6 +29,12 @@ function Navbar() {
         >
           Doctors
         </Link>
+        <Link
+          to="/my-appointments"
+          className="text-slate-600 font-medium hover:text-blue-600 transition-colors"
+        >
+          My Appointments
+        </Link>
 
         {user ? (
           <div className="flex items-center gap-3">
