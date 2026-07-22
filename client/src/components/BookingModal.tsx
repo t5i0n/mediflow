@@ -46,7 +46,7 @@ function BookingModal({
     <Modal isOpen={isOpen} onClose={onClose} title={`Book with ${doctorName}`}>
       <div className="flex flex-col gap-4">
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
             Select a date
           </label>
           <input
@@ -57,17 +57,19 @@ function BookingModal({
               setSelectedDate(e.target.value);
               setSelectedTime(null);
             }}
-            className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
         {selectedDate && (
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
               Select a time
             </label>
             {isLoading && (
-              <p className="text-slate-500 text-sm">Loading slots...</p>
+              <p className="text-slate-500 dark:text-slate-400 text-sm">
+                Loading slots...
+              </p>
             )}
             <div className="grid grid-cols-4 gap-2">
               {slots?.map((slot) => (
@@ -77,10 +79,10 @@ function BookingModal({
                   onClick={() => setSelectedTime(slot.time)}
                   className={`text-sm py-2 rounded-lg border transition-colors ${
                     !slot.available
-                      ? "bg-slate-100 text-slate-300 border-slate-100 cursor-not-allowed"
+                      ? "bg-slate-100 dark:bg-slate-800 text-slate-300 dark:text-slate-600 border-slate-100 dark:border-slate-800 cursor-not-allowed"
                       : selectedTime === slot.time
                         ? "bg-blue-600 text-white border-blue-600"
-                        : "bg-white text-slate-700 border-slate-300 hover:border-blue-400"
+                        : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700 hover:border-blue-400"
                   }`}
                 >
                   {slot.time}

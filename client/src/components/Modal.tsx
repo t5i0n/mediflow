@@ -12,24 +12,21 @@ function Modal({ isOpen, onClose, title, children }: ModalProps) {
 
   return (
     <div
-      className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50"
-      onClick={onClose}
+      className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg w-full max-w-md p-6"
+      onClick={(e) => e.stopPropagation()}
     >
-      <div
-        className="bg-white rounded-2xl shadow-lg w-full max-w-md p-6"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-slate-900">{title}</h2>
-          <button
-            onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 text-2xl leading-none"
-          >
-            ×
-          </button>
-        </div>
-        {children}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+          {title}
+        </h2>
+        <button
+          onClick={onClose}
+          className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-2xl leading-none"
+        >
+          ×
+        </button>
       </div>
+      {children}
     </div>
   );
 }
