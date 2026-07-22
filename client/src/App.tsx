@@ -9,6 +9,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import RegisterPage from "./pages/RegisterPage";
 import MyAppointmentsPage from "./pages/MyAppointmentsPage";
 import DoctorDashboardPage from "./pages/DoctorDashboardPage";
+import AdminDashboardPage from "./pages/AdminDashboardPage";
 
 function App() {
   return (
@@ -56,6 +57,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <DoctorDashboardPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute allowedRoles={["ADMIN"]}>
+                  <AdminDashboardPage />
                 </ProtectedRoute>
               }
             />

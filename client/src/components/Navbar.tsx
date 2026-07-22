@@ -50,6 +50,15 @@ function Navbar() {
           </Link>
         )}
 
+        {user?.role === "ADMIN" && (
+          <Link
+            to="/admin"
+            className="text-slate-600 font-medium hover:text-blue-600 transition-colors"
+          >
+            Admin
+          </Link>
+        )}
+
         {user ? (
           <div className="flex items-center gap-3">
             <span className="text-sm text-slate-500">{user.email}</span>
