@@ -4,6 +4,7 @@ import axios from "axios";
 import { api } from "../api/axios";
 import { createAppointment } from "../api/appointments";
 import DoctorCard from "../components/DoctorCard";
+import BookingModal from "../components/BookingModal";
 
 type Doctor = {
   id: string;
@@ -17,6 +18,7 @@ type Doctor = {
 function DoctorsPage() {
   const [bookedDoctor, setBookedDoctor] = useState<string | null>(null);
   const [bookingError, setBookingError] = useState<string | null>(null);
+  const [activeDoctor, setActiveDoctor] = useState<Doctor | null>(null);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["doctors"],
@@ -28,12 +30,14 @@ function DoctorsPage() {
 
   const bookingMutation = useMutation({
     mutationFn: createAppointment,
-    onSuccess: (_, variables) => {
-      const doctor = data?.find((d) => d.id === variables.doctorId);
+    onSuccess: () => {
       setBookedDoctor(
-        doctor ? `Dr. ${doctor.firstName} ${doctor.lastName}` : "the doctor",
+        activeDoctor
+          ? `Dr. ${activeDoctor.firstName} ${activeDoctor.lastName}`
+          : "the doctor",
       );
       setBookingError(null);
+      setActiveDoctor(null);
     },
     onError: (error) => {
       if (axios.isAxiosError(error) && error.response?.data?.error) {
@@ -41,7 +45,6 @@ function DoctorsPage() {
       } else {
         setBookingError("Failed to book appointment");
       }
-      setBookedDoctor(null);
     },
   });
 
@@ -72,17 +75,30 @@ function DoctorsPage() {
             name={`Dr. ${doctor.firstName} ${doctor.lastName}`}
             specialty={doctor.specialization}
             yearsExperience={doctor.yearsExperience ?? 0}
-            onBook={() =>
-              bookingMutation.mutate({
-                doctorId: doctor.id,
-                date: "2026-08-01",
-                timeSlot: "10:00",
-                reason: "General consultation",
-              })
-            }
+            onBook={() => {
+              setBookingError(null);
+              setActiveDoctor(doctor);
+            }}
           />
         ))}
       </div>
+
+      {activeDoctor && (
+        <BookingModal
+          isOpen={!!activeDoctor}
+          onClose={() => setActiveDoctor(null)}
+          doctorId={activeDoctor.id}
+          doctorName={`${activeDoctor.firstName} ${activeDoctor.lastName}`}
+          onConfirm={(date, timeSlot) =>
+            bookingMutation.mutate({
+              doctorId: activeDoctor.id,
+              date,
+              timeSlot,
+              reason: "General consultation",
+            })
+          }
+        />
+      )}
     </div>
   );
 }
