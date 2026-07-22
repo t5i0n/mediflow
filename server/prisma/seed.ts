@@ -54,6 +54,18 @@ async function main() {
     },
   });
 
+  const adminPasswordHash = await bcrypt.hash("adminpass123", 10);
+
+  await prisma.user.upsert({
+    where: { email: "admin@mediflow.com" },
+    update: {},
+    create: {
+      email: "admin@mediflow.com",
+      passwordHash: adminPasswordHash,
+      role: "ADMIN",
+    },
+  });
+
   console.log("Seed complete: departments + doctors created");
 }
 

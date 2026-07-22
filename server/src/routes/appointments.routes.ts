@@ -150,4 +150,18 @@ router.patch(
     res.json(updated);
   },
 );
+
+// Admin: view ALL appointments across the system
+router.get(
+  "/admin/all",
+  requireAuth,
+  requireRole("ADMIN"),
+  async (req: AuthenticatedRequest, res) => {
+    const appointments = await prisma.appointment.findMany({
+      include: { patient: true, doctor: true, department: true },
+      orderBy: { date: "desc" },
+    });
+    res.json(appointments);
+  },
+);
 export default router;

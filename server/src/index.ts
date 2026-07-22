@@ -5,6 +5,8 @@ import { prisma } from "./lib/prisma.js";
 import authRoutes from "./routes/auth.routes.js";
 import { requireAuth } from "./middleware/auth.middleware.js";
 import appointmentRoutes from "./routes/appointments.routes.js";
+import bcrypt from "bcrypt";
+import { requireRole } from "./middleware/role.middleware.js";
 
 const app = express();
 
@@ -74,3 +76,43 @@ app.get("/api/doctors/:id/slots", requireAuth, async (req, res) => {
 
   res.json(slots);
 });
+
+app.post(
+  "/api/admin/doctors",
+  requireAuth,
+  requireRole("ADMIN"),
+  async (req, res) => {
+    const {
+      email,
+      password,
+      firstName,
+      lastName,
+      specialization,
+      departmentId,
+      yearsExperience,
+    } = req.body;
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const user = await prisma.user.create({
+      data: {
+        email,
+        passwordHash,
+        role: "DOCTOR",
+        doctor: {
+          create: {
+            firstName,
+            lastName,
+            specialization,
+            departmentId,
+            yearsExperience,
+          },
+        },
+      },
+      include: { doctor: true },
+    });
+
+    const { passwordHash: _, ...safeUser } = user;
+    res.status(201).json(safeUser);
+  },
+);
