@@ -8,6 +8,7 @@ import { AuthProvider } from "./contexts/AuthProvider";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RegisterPage from "./pages/RegisterPage";
 import MyAppointmentsPage from "./pages/MyAppointmentsPage";
+import DoctorDashboardPage from "./pages/DoctorDashboardPage";
 
 function App() {
   return (
@@ -47,6 +48,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <MyAppointmentsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/doctor-dashboard"
+              element={
+                <ProtectedRoute>
+                  <DoctorDashboardPage />
                 </ProtectedRoute>
               }
             />
