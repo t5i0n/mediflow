@@ -38,11 +38,14 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-73px)] flex items-center justify-center bg-slate-50 p-6">
-      <div className="bg-white rounded-2xl shadow-md border border-slate-100 p-8 w-full max-w-sm">
-        <h1 className="text-2xl font-bold text-slate-900 mb-1">Welcome back</h1>
-        <p className="text-slate-500 mb-6">Log in to your MediFlow account</p>
-
+    <div className="min-h-[calc(100vh-73px)] flex items-center justify-center bg-slate-50 dark:bg-slate-950 p-6">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-md border border-slate-100 dark:border-slate-800 p-8 w-full max-w-sm">
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">
+          Welcome back
+        </h1>
+        <p className="text-slate-500 dark:text-slate-400 mb-6">
+          Log in to your MediFlow account
+        </p>
         {serverError && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm mb-4">
             {serverError}
