@@ -23,18 +23,32 @@ function Navbar() {
         >
           Dashboard
         </Link>
-        <Link
-          to="/doctors"
-          className="text-slate-600 font-medium hover:text-blue-600 transition-colors"
-        >
-          Doctors
-        </Link>
-        <Link
-          to="/my-appointments"
-          className="text-slate-600 font-medium hover:text-blue-600 transition-colors"
-        >
-          My Appointments
-        </Link>
+
+        {user?.role === "PATIENT" && (
+          <>
+            <Link
+              to="/doctors"
+              className="text-slate-600 font-medium hover:text-blue-600 transition-colors"
+            >
+              Doctors
+            </Link>
+            <Link
+              to="/my-appointments"
+              className="text-slate-600 font-medium hover:text-blue-600 transition-colors"
+            >
+              My Appointments
+            </Link>
+          </>
+        )}
+
+        {user?.role === "DOCTOR" && (
+          <Link
+            to="/doctor-dashboard"
+            className="text-slate-600 font-medium hover:text-blue-600 transition-colors"
+          >
+            My Schedule
+          </Link>
+        )}
 
         {user ? (
           <div className="flex items-center gap-3">
