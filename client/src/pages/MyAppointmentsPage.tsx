@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../api/axios";
+import Skeleton from "../components/Skeleton";
 
 type Appointment = {
   id: string;
@@ -35,8 +36,27 @@ function MyAppointmentsPage() {
     },
   });
 
-  if (isLoading)
-    return <p className="p-6 text-slate-500">Loading your appointments...</p>;
+  if (isLoading) {
+    return (
+      <div className="p-6 max-w-2xl mx-auto flex flex-col gap-4">
+        <h1 className="text-3xl font-bold text-slate-900 mt-4 mb-2">
+          My Appointments
+        </h1>
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="bg-white rounded-2xl shadow-md border border-slate-100 p-5 flex items-center justify-between"
+          >
+            <div className="flex-1">
+              <Skeleton className="h-4 w-40 mb-2" />
+              <Skeleton className="h-3 w-56" />
+            </div>
+            <Skeleton className="h-6 w-20 rounded-full" />
+          </div>
+        ))}
+      </div>
+    );
+  }
   if (isError)
     return <p className="p-6 text-red-600">Failed to load appointments.</p>;
 
