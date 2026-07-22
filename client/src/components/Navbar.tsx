@@ -11,7 +11,7 @@ function Navbar() {
   }
 
   return (
-    <nav className="w-full bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+    <nav className="w-full bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-40">
       <Link to="/" className="text-xl font-bold text-blue-600">
         MediFlow
       </Link>
