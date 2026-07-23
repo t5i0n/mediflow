@@ -6,6 +6,7 @@ import { api } from "../api/axios";
 import { useAuth } from "../contexts/useAuth";
 import StatCard from "../components/StatCard";
 import AppointmentListItem from "../components/AppointmentListItem";
+import { AlertCircle } from "lucide-react";
 
 type PatientAppointment = {
   id: string;
@@ -96,6 +97,32 @@ function DashboardPage() {
           </button>
         )}
       </motion.div>
+
+      {user?.role === "PATIENT" && patientUpcoming.length === 0 && (
+        <div className="bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-900 rounded-2xl p-6 mb-8 flex items-start gap-4">
+          <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center text-amber-500 dark:text-amber-400 shrink-0">
+            <AlertCircle size={20} />
+          </div>
+          <div>
+            <p className="text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wide mb-1">
+              Health reminder
+            </p>
+            <h3 className="text-slate-900 dark:text-white font-semibold mb-1">
+              You don't have any upcoming appointments.
+            </h3>
+            <p className="text-slate-500 dark:text-slate-400 text-sm mb-4">
+              Regular checkups help catch issues early — consider booking a
+              visit.
+            </p>
+            <button
+              onClick={() => navigate("/doctors")}
+              className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+            >
+              Schedule now
+            </button>
+          </div>
+        </div>
+      )}
 
       {user?.role === "PATIENT" && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
