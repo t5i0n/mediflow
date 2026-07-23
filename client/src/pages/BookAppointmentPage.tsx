@@ -17,11 +17,25 @@ type Doctor = {
   department: { id: string; name: string };
 };
 
+type Slot = { time: string; available: boolean };
+
+function getNext7Days() {
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const date = new Date();
+    date.setDate(date.getDate() + i);
+    days.push(date);
+  }
+  return days;
+}
+
 function BookAppointmentPage() {
   const [step, setStep] = useState(1);
   const [selectedDepartment, setSelectedDepartment] =
     useState<Department | null>(null);
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
 
   const { data: departments, isLoading } = useQuery({
     queryKey: ["departments"],
@@ -37,6 +51,20 @@ function BookAppointmentPage() {
   const doctorsInDepartment =
     doctors?.filter((doc) => doc.department.id === selectedDepartment?.id) ??
     [];
+
+  const { data: slots, isLoading: slotsLoading } = useQuery({
+    queryKey: ["slots", selectedDoctor?.id, selectedDate],
+    queryFn: async () => {
+      const response = await api.get<Slot[]>(
+        `/doctors/${selectedDoctor?.id}/slots`,
+        {
+          params: { date: selectedDate },
+        },
+      );
+      return response.data;
+    },
+    enabled: step === 3 && !!selectedDoctor && !!selectedDate,
+  });
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
@@ -136,6 +164,78 @@ function BookAppointmentPage() {
             </div>
           </div>
         )}
+
+        {step === 3 && selectedDoctor && (
+          <div>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">
+              When works for you?
+            </h2>
+            <p className="text-slate-500 dark:text-slate-400 mb-6">
+              Dr. {selectedDoctor.firstName} {selectedDoctor.lastName} has these
+              openings.
+            </p>
+
+            <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-2">
+              Select date
+            </p>
+            <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 mb-6">
+              {getNext7Days().map((date) => {
+                const dateStr = date.toISOString().split("T")[0];
+                const isSelected = selectedDate === dateStr;
+                return (
+                  <button
+                    key={dateStr}
+                    onClick={() => {
+                      setSelectedDate(dateStr);
+                      setSelectedTime(null);
+                    }}
+                    className={`flex flex-col items-center py-3 rounded-xl border transition-colors ${
+                      isSelected
+                        ? "bg-blue-600 border-blue-600 text-white"
+                        : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-blue-300"
+                    }`}
+                  >
+                    <span className="text-[10px] font-semibold uppercase tracking-wide opacity-70">
+                      {date.toLocaleDateString(undefined, { weekday: "short" })}
+                    </span>
+                    <span className="text-lg font-bold">{date.getDate()}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {selectedDate && (
+              <>
+                <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide mb-2">
+                  Select time
+                </p>
+                {slotsLoading && (
+                  <p className="text-slate-400 text-sm">
+                    Loading availability...
+                  </p>
+                )}
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                  {slots?.map((slot) => (
+                    <button
+                      key={slot.time}
+                      disabled={!slot.available}
+                      onClick={() => setSelectedTime(slot.time)}
+                      className={`py-2.5 rounded-xl border font-medium transition-colors ${
+                        !slot.available
+                          ? "bg-slate-100 dark:bg-slate-800 text-slate-300 dark:text-slate-600 border-slate-100 dark:border-slate-800 cursor-not-allowed"
+                          : selectedTime === slot.time
+                            ? "bg-blue-600 border-blue-600 text-white"
+                            : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-blue-300"
+                      }`}
+                    >
+                      {slot.time}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="flex justify-between mt-6">
@@ -149,7 +249,8 @@ function BookAppointmentPage() {
         <button
           disabled={
             (step === 1 && !selectedDepartment) ||
-            (step === 2 && !selectedDoctor)
+            (step === 2 && !selectedDoctor) ||
+            (step === 3 && (!selectedDate || !selectedTime))
           }
           onClick={() => setStep((s) => s + 1)}
           className="px-5 py-2 rounded-lg font-medium bg-slate-800 dark:bg-slate-700 text-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-900 dark:hover:bg-slate-600 transition-colors"
