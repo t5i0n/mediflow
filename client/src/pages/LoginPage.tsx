@@ -38,7 +38,7 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-73px)] flex items-center justify-center bg-slate-50 dark:bg-slate-950 p-6">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 p-6">
       <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-md border border-slate-100 dark:border-slate-800 p-8 w-full max-w-sm">
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">
           Welcome back
