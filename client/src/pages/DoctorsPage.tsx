@@ -52,12 +52,14 @@ function DoctorsPage() {
   if (isLoading) {
     return (
       <div className="p-6 flex flex-col items-center gap-8">
-        <h1 className="text-3xl font-bold text-slate-900 mt-4">Our Doctors</h1>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white mt-4">
+          Our Doctors
+        </h1>
         <div className="flex flex-col md:flex-row flex-wrap justify-center gap-6">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="w-full sm:w-72 bg-white rounded-2xl shadow-sm border border-slate-100 p-6"
+              className="w-full sm:w-72 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-6"
             >
               <div className="flex items-center gap-3 mb-4">
                 <Skeleton className="w-12 h-12 rounded-full" />
@@ -74,20 +76,28 @@ function DoctorsPage() {
       </div>
     );
   }
-  if (isError)
-    return <p className="p-6 text-red-600">Failed to load doctors.</p>;
+
+  if (isError) {
+    return (
+      <p className="p-6 text-red-600 dark:text-red-400">
+        Failed to load doctors.
+      </p>
+    );
+  }
 
   return (
     <div className="p-6 flex flex-col items-center gap-8">
-      <h1 className="text-3xl font-bold text-slate-900 mt-4">Our Doctors</h1>
+      <h1 className="text-3xl font-bold text-slate-900 dark:text-white mt-4">
+        Our Doctors
+      </h1>
 
       {bookedDoctor && (
-        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg font-medium">
+        <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 px-4 py-3 rounded-lg font-medium">
           ✅ Appointment booked with {bookedDoctor}!
         </div>
       )}
       {bookingError && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg font-medium">
+        <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg font-medium">
           {bookingError}
         </div>
       )}
