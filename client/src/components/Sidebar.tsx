@@ -40,6 +40,19 @@ function Sidebar() {
         </span>
       </div>
 
+      <div className="bg-slate-50 dark:bg-slate-800 rounded-xl px-3 py-2.5 mb-4">
+        <p className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">
+          {user?.role === "PATIENT"
+            ? "Patient ID"
+            : user?.role === "DOCTOR"
+              ? "Doctor ID"
+              : "Admin ID"}
+        </p>
+        <p className="text-sm font-mono text-slate-700 dark:text-slate-200">
+          {user?.id.slice(0, 8).toUpperCase()}
+        </p>
+      </div>
+
       <nav className="flex flex-col gap-1 flex-1">
         <Link
           to="/"
