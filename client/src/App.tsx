@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Navbar from "./components/Navbar";
 import DoctorsPage from "./pages/DoctorsPage";
 import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
@@ -11,67 +10,78 @@ import MyAppointmentsPage from "./pages/MyAppointmentsPage";
 import DoctorDashboardPage from "./pages/DoctorDashboardPage";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 import { ThemeProvider } from "./contexts/ThemeProvider";
+import AppLayout from "./layouts/AppLayout";
 
 function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
         <BrowserRouter>
-          <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
-            <Navbar />
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
                     <DashboardPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/doctors"
-                element={
-                  <ProtectedRoute>
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/doctors"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
                     <DoctorsPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/departments"
-                element={
-                  <ProtectedRoute>
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/departments"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
                     <DepartmentsPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route
-                path="/my-appointments"
-                element={
-                  <ProtectedRoute>
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-appointments"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
                     <MyAppointmentsPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/doctor-dashboard"
-                element={
-                  <ProtectedRoute>
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/doctor-dashboard"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
                     <DoctorDashboardPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin"
-                element={
-                  <ProtectedRoute allowedRoles={["ADMIN"]}>
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute allowedRoles={["ADMIN"]}>
+                  <AppLayout>
                     <AdminDashboardPage />
-                  </ProtectedRoute>
-                }
-              />
-            </Routes>
-          </div>
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
         </BrowserRouter>
       </AuthProvider>
     </ThemeProvider>
