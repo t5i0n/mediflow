@@ -11,6 +11,7 @@ import DoctorDashboardPage from "./pages/DoctorDashboardPage";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 import { ThemeProvider } from "./contexts/ThemeProvider";
 import AppLayout from "./layouts/AppLayout";
+import BookAppointmentPage from "./pages/BookAppointmentPage";
 
 function App() {
   return (
@@ -77,6 +78,16 @@ function App() {
                 <ProtectedRoute allowedRoles={["ADMIN"]}>
                   <AppLayout>
                     <AdminDashboardPage />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/book"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <BookAppointmentPage />
                   </AppLayout>
                 </ProtectedRoute>
               }

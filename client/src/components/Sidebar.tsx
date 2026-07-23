@@ -3,6 +3,7 @@ import {
   LayoutDashboard,
   Stethoscope,
   CalendarClock,
+  CalendarPlus,
   ShieldCheck,
   LogOut,
 } from "lucide-react";
@@ -64,6 +65,13 @@ function Sidebar() {
 
         {user?.role === "PATIENT" && (
           <>
+            <Link
+              to="/book"
+              className={`${linkBase} ${isActive("/book") ? linkActive : linkInactive}`}
+            >
+              <CalendarPlus size={18} />
+              Book Appointment
+            </Link>
             <Link
               to="/doctors"
               className={`${linkBase} ${isActive("/doctors") ? linkActive : linkInactive}`}
