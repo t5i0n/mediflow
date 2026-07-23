@@ -1,6 +1,9 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { api } from "../api/axios";
+import { createAppointment } from "../api/appointments";
 import BookingStepper from "../components/BookingStepper";
 
 type Department = {
@@ -30,12 +33,17 @@ function getNext7Days() {
 }
 
 function BookAppointmentPage() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
   const [step, setStep] = useState(1);
   const [selectedDepartment, setSelectedDepartment] =
     useState<Department | null>(null);
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [reason, setReason] = useState("");
+  const [bookingError, setBookingError] = useState<string | null>(null);
 
   const { data: departments, isLoading } = useQuery({
     queryKey: ["departments"],
@@ -65,6 +73,32 @@ function BookAppointmentPage() {
     },
     enabled: step === 3 && !!selectedDoctor && !!selectedDate,
   });
+
+  const bookingMutation = useMutation({
+    mutationFn: createAppointment,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["my-appointments"] });
+      navigate("/my-appointments");
+    },
+    onError: (error) => {
+      if (axios.isAxiosError(error) && error.response?.data?.error) {
+        setBookingError(error.response.data.error);
+      } else {
+        setBookingError("Failed to book appointment");
+      }
+    },
+  });
+
+  function handleConfirm() {
+    if (!selectedDoctor || !selectedDate || !selectedTime) return;
+    setBookingError(null);
+    bookingMutation.mutate({
+      doctorId: selectedDoctor.id,
+      date: selectedDate,
+      timeSlot: selectedTime,
+      reason: reason || undefined,
+    });
+  }
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
@@ -236,6 +270,66 @@ function BookAppointmentPage() {
             )}
           </div>
         )}
+
+        {step === 4 &&
+          selectedDoctor &&
+          selectedDepartment &&
+          selectedDate &&
+          selectedTime && (
+            <div>
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">
+                Confirm your appointment
+              </h2>
+              <p className="text-slate-500 dark:text-slate-400 mb-6">
+                Review the details before booking.
+              </p>
+
+              <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-5 flex flex-col gap-3 mb-6">
+                {[
+                  [
+                    "Doctor",
+                    `Dr. ${selectedDoctor.firstName} ${selectedDoctor.lastName}`,
+                  ],
+                  ["Department", selectedDepartment.name],
+                  [
+                    "Date",
+                    new Date(selectedDate).toLocaleDateString(undefined, {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    }),
+                  ],
+                  ["Time", selectedTime],
+                ].map(([label, value]) => (
+                  <div key={label} className="flex justify-between text-sm">
+                    <span className="text-slate-500 dark:text-slate-400">
+                      {label}
+                    </span>
+                    <span className="font-semibold text-slate-900 dark:text-white">
+                      {value}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                Reason for visit (optional)
+              </label>
+              <textarea
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="Briefly describe what you'd like to discuss..."
+                rows={3}
+                className="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+
+              {bookingError && (
+                <p className="text-red-600 dark:text-red-400 text-sm mt-3">
+                  {bookingError}
+                </p>
+              )}
+            </div>
+          )}
       </div>
 
       <div className="flex justify-between mt-6">
@@ -246,17 +340,28 @@ function BookAppointmentPage() {
         >
           ← Back
         </button>
-        <button
-          disabled={
-            (step === 1 && !selectedDepartment) ||
-            (step === 2 && !selectedDoctor) ||
-            (step === 3 && (!selectedDate || !selectedTime))
-          }
-          onClick={() => setStep((s) => s + 1)}
-          className="px-5 py-2 rounded-lg font-medium bg-slate-800 dark:bg-slate-700 text-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-900 dark:hover:bg-slate-600 transition-colors"
-        >
-          Continue →
-        </button>
+
+        {step < 4 ? (
+          <button
+            disabled={
+              (step === 1 && !selectedDepartment) ||
+              (step === 2 && !selectedDoctor) ||
+              (step === 3 && (!selectedDate || !selectedTime))
+            }
+            onClick={() => setStep((s) => s + 1)}
+            className="px-5 py-2 rounded-lg font-medium bg-slate-800 dark:bg-slate-700 text-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-900 dark:hover:bg-slate-600 transition-colors"
+          >
+            Continue →
+          </button>
+        ) : (
+          <button
+            onClick={handleConfirm}
+            disabled={bookingMutation.isPending}
+            className="px-5 py-2 rounded-lg font-medium bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white disabled:opacity-60 transition-colors"
+          >
+            {bookingMutation.isPending ? "Booking..." : "Confirm booking"}
+          </button>
+        )}
       </div>
     </div>
   );
