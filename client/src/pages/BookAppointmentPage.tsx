@@ -9,15 +9,34 @@ type Department = {
   description: string | null;
 };
 
+type Doctor = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  specialization: string;
+  department: { id: string; name: string };
+};
+
 function BookAppointmentPage() {
   const [step, setStep] = useState(1);
   const [selectedDepartment, setSelectedDepartment] =
     useState<Department | null>(null);
+  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
 
   const { data: departments, isLoading } = useQuery({
     queryKey: ["departments"],
     queryFn: async () => (await api.get<Department[]>("/departments")).data,
   });
+
+  const { data: doctors, isLoading: doctorsLoading } = useQuery({
+    queryKey: ["doctors"],
+    queryFn: async () => (await api.get<Doctor[]>("/doctors")).data,
+    enabled: step === 2,
+  });
+
+  const doctorsInDepartment =
+    doctors?.filter((doc) => doc.department.id === selectedDepartment?.id) ??
+    [];
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
@@ -64,6 +83,59 @@ function BookAppointmentPage() {
             </div>
           </div>
         )}
+
+        {step === 2 && selectedDepartment && (
+          <div>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">
+              Choose a doctor
+            </h2>
+            <p className="text-slate-500 dark:text-slate-400 mb-6">
+              {doctorsInDepartment.length} specialist
+              {doctorsInDepartment.length !== 1 ? "s" : ""} in{" "}
+              {selectedDepartment.name}.
+            </p>
+
+            {doctorsLoading && (
+              <p className="text-slate-400 text-sm">Loading doctors...</p>
+            )}
+
+            <div className="flex flex-col gap-3">
+              {doctorsInDepartment.map((doc) => {
+                const initials =
+                  `${doc.firstName[0]}${doc.lastName[0]}`.toUpperCase();
+                return (
+                  <button
+                    key={doc.id}
+                    onClick={() => setSelectedDoctor(doc)}
+                    className={`flex items-center gap-3 text-left px-4 py-3 rounded-xl border transition-colors ${
+                      selectedDoctor?.id === doc.id
+                        ? "border-blue-600 bg-blue-50 dark:bg-blue-950"
+                        : "border-slate-200 dark:border-slate-700 hover:border-blue-300"
+                    }`}
+                  >
+                    <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center font-semibold text-sm shrink-0">
+                      {initials}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-slate-900 dark:text-white">
+                        Dr. {doc.firstName} {doc.lastName}
+                      </p>
+                      <p className="text-slate-500 dark:text-slate-400 text-sm">
+                        {doc.specialization}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
+
+              {!doctorsLoading && doctorsInDepartment.length === 0 && (
+                <p className="text-slate-400 text-sm">
+                  No doctors available in this department yet.
+                </p>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="flex justify-between mt-6">
@@ -75,7 +147,10 @@ function BookAppointmentPage() {
           ← Back
         </button>
         <button
-          disabled={step === 1 && !selectedDepartment}
+          disabled={
+            (step === 1 && !selectedDepartment) ||
+            (step === 2 && !selectedDoctor)
+          }
           onClick={() => setStep((s) => s + 1)}
           className="px-5 py-2 rounded-lg font-medium bg-slate-800 dark:bg-slate-700 text-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-900 dark:hover:bg-slate-600 transition-colors"
         >
